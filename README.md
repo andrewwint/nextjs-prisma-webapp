@@ -1,5 +1,15 @@
 # REST API Example
 
+[![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/andrewwint/nextjs-prisma-webapp/soc2)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=andrewwint%2Fnextjs-prisma-webapp&benchmark=SOC2)
+
+[![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/andrewwint/nextjs-prisma-webapp/hipaa)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=andrewwint%2Fnextjs-prisma-webapp&benchmark=HIPAA)
+
+[![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/andrewwint/nextjs-prisma-webapp/pci)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=andrewwint%2Fnextjs-prisma-webapp&benchmark=PCI-DSS+V3.2)
+
+[![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/andrewwint/nextjs-prisma-webapp/iso)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=andrewwint%2Fnextjs-prisma-webapp&benchmark=ISO27001)
+
+[![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/andrewwint/nextjs-prisma-webapp/nist)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=andrewwint%2Fnextjs-prisma-webapp&benchmark=NIST-800-53)
+
 This example shows how to implement a **REST API** using [NestJS](https://docs.nestjs.com/) and [Prisma Client](https://www.prisma.io/docs/concepts/components/prisma-client). The example uses an SQLite database file with some initial dummy data which you can find at [`./prisma/dev.db`](./prisma/dev.db). The example was bootstrapped using the NestJS CLI command `nest new rest-nestjs`.
 
 ## Getting started
