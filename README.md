@@ -22,7 +22,7 @@ Download this example:
 npx try-prisma@latest --template typescript/rest-nestjs
 ```
 
-Install npm dependencies:
+Install npm dependencies
 
 ```
 cd rest-nestjs
