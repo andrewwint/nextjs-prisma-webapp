@@ -1,4 +1,4 @@
-# Fullstack Example with Next.js (REST API)
+# Fullstack Example with Next.js (REST API) and Docker
 
 This example shows how to implement a **fullstack app in TypeScript with [Next.js](https://nextjs.org/)** using [React](https://reactjs.org/) and [Prisma Client](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client). It uses a SQLite database file with some initial dummy data which you can find at [`./prisma/dev.db`](./prisma/dev.db).
 
