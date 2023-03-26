@@ -1,6 +1,6 @@
-# REST API Example
+# Fullstack Example with Next.js (REST API)
 
-This example shows how to implement a **REST API** using [NestJS](https://docs.nestjs.com/) and [Prisma Client](https://www.prisma.io/docs/concepts/components/prisma-client). The example uses an SQLite database file with some initial dummy data which you can find at [`./prisma/dev.db`](./prisma/dev.db). The example was bootstrapped using the NestJS CLI command `nest new rest-nestjs`.
+This example shows how to implement a **fullstack app in TypeScript with [Next.js](https://nextjs.org/)** using [React](https://reactjs.org/) and [Prisma Client](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client). It uses a SQLite database file with some initial dummy data which you can find at [`./prisma/dev.db`](./prisma/dev.db).
 
 ## Getting started
 
@@ -9,13 +9,13 @@ This example shows how to implement a **REST API** using [NestJS](https://docs.n
 Download this example:
 
 ```
-npx try-prisma@latest --template typescript/rest-nestjs
+npx try-prisma@latest --template typescript/rest-nextjs-api-routes
 ```
 
 Install npm dependencies:
 
 ```
-cd rest-nestjs
+cd rest-nextjs-api-routes
 npm install
 ```
 
@@ -30,7 +30,7 @@ git clone git@github.com:prisma/prisma-examples.git --depth=1
 Install npm dependencies:
 
 ```
-cd prisma-examples/typescript/rest-nestjs
+cd prisma-examples/typescript/rest-nextjs-api-routes
 npm install
 ```
 
@@ -47,58 +47,76 @@ npx prisma migrate dev --name init
 When `npx prisma migrate dev` is executed against a newly created database, seeding is also triggered. The seed file in [`prisma/seed.ts`](./prisma/seed.ts) will be executed and your database will be populated with the sample data.
 
 
-### 3. Start the REST API server
+### 3. Start the app
 
 ```
 npm run dev
 ```
 
-The server is now running on `http://localhost:3000`. You can now run the API requests, e.g. [`http://localhost:3000/feed`](http://localhost:3000/feed).
+The app is now running, navigate to [`http://localhost:3000/`](http://localhost:3000/) in your browser to explore its UI.
+
+<details><summary>Expand for a tour through the UI of the app</summary>
+
+<br />
+
+**Blog** (located in [`./pages/index.tsx`](./pages/index.tsx))
+
+![](https://imgur.com/eepbOUO.png)
+
+**Signup** (located in [`./pages/signup.tsx`](./pages/signup.tsx))
+
+![](https://imgur.com/iE6OaBI.png)
+
+**Create post (draft)** (located in [`./pages/create.tsx`](./pages/create.tsx))
+
+![](https://imgur.com/olCWRNv.png)
+
+**Drafts** (located in [`./pages/drafts.tsx`](./pages/drafts.tsx))
+
+![](https://imgur.com/PSMzhcd.png)
+
+**View post** (located in [`./pages/p/[id].tsx`](./pages/p/[id].tsx)) (delete or publish here)
+
+![](https://imgur.com/zS1B11O.png)
+
+</details>
 
 ## Using the REST API
 
-You can access the REST API of the server using the following endpoints:
+You can also access the REST API of the API server directly. It is running on the same host machine and port and can be accessed via the `/api` route (in this case that is `localhost:3000/api/`, so you can e.g. reach the API with [`localhost:3000/api/feed`](http://localhost:3000/api/feed)).
 
 ### `GET`
 
-- `/post/:id`: Fetch a single post by its `id`
-- `/feed?searchString={searchString}&take={take}&skip={skip}&orderBy={orderBy}`: Fetch all _published_ posts
-  - Query Parameters
-    - `searchString` (optional): This filters posts by `title` or `content`
-    - `take` (optional): This specifies how many objects should be returned in the list
-    - `skip` (optional): This specifies how many of the returned objects in the list should be skipped
-    - `orderBy` (optional): The sort order for posts in either ascending or descending order. The value can either `asc` or `desc`
-- `/user/:id/drafts`: Fetch user's drafts by their `id`
-- `/users`: Fetch all users
+- `/api/feed`: Fetch all _published_ posts
+- `/api/filterPosts?searchString={searchString}`: Filter posts by `title` or `content`
+
 ### `POST`
 
-- `/post`: Create a new post
+- `/api/post`: Create a new post
   - Body:
     - `title: String` (required): The title of the post
     - `content: String` (optional): The content of the post
     - `authorEmail: String` (required): The email of the user that creates the post
-- `/signup`: Create a new user
+- `/api/user`: Create a new user
   - Body:
     - `email: String` (required): The email address of the user
     - `name: String` (optional): The name of the user
-    - `postData: PostCreateInput[]` (optional): The posts of the user
 
 ### `PUT`
 
-- `/publish/:id`: Toggle the publish value of a post by its `id`
-- `/post/:id/views`: Increases the `viewCount` of a `Post` by one `id`
+- `/api/publish/:id`: Publish a post by its `id`
 
 ### `DELETE`
 
-- `/post/:id`: Delete a post by its `id`
-
+- `/api/post/:id`: Delete a post by its `id`
 
 ## Evolving the app
 
-Evolving the application typically requires two steps:
+Evolving the application typically requires three steps:
 
 1. Migrate your database using Prisma Migrate
-1. Update your application code
+1. Update your server-side application code
+1. Build new UI features in React
 
 For the following example scenario, assume you want to add a "profile" feature to the app where users can create a profile and write a short bio about themselves.
 
@@ -107,137 +125,94 @@ For the following example scenario, assume you want to add a "profile" feature t
 The first step is to add a new table, e.g. called `Profile`, to the database. You can do this by adding a new model to your [Prisma schema file](./prisma/schema.prisma) file and then running a migration afterwards:
 
 ```diff
-// ./prisma/schema.prisma
+// schema.prisma
+
+model Post {
+  id        Int     @default(autoincrement()) @id
+  title     String
+  content   String?
+  published Boolean @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int
+}
 
 model User {
-  id      Int      @default(autoincrement()) @id
-  name    String?
+  id      Int      @default(autoincrement()) @id 
+  name    String? 
   email   String   @unique
   posts   Post[]
 + profile Profile?
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  viewCount Int      @default(0)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
-}
-
 +model Profile {
 +  id     Int     @default(autoincrement()) @id
 +  bio    String?
-+  user   User    @relation(fields: [userId], references: [id])
 +  userId Int     @unique
++  user   User    @relation(fields: [userId], references: [id])
 +}
 ```
 
 Once you've updated your data model, you can execute the changes against your database with the following command:
 
 ```
-npx prisma migrate dev --name add-profile
+npx prisma migrate dev
 ```
-
-This adds another migration to the `prisma/migrations` directory and creates the new `Profile` table in the database.
 
 ### 2. Update your application code
 
-You can now use your `PrismaClient` instance to perform operations against the new `Profile` table. Those operations can be used to implement API endpoints in the REST API.
+You can now use your `PrismaClient` instance to perform operations against the new `Profile` table. Here are some examples:
 
-#### 2.1 Add the API endpoint to your app
-
-Update your `AppController` class inside `app.controller.ts` file by adding a new endpoint to your API:
-
-```ts
-@Post('user/:id/profile')
-async createUserProfile(
-  @Param('id') id: string,
-  @Body() userBio: { bio: string }
-): Promise<Profile> {
-  return this.prismaService.profile.create({
-    data: {
-      bio: userBio.bio,
-      user: {
-        connect: {
-          id: Number(id)
-        }
-      }
-    }
-  })
-}
-```
-
-At the top of `app.controller.ts`, update your imports to include `Profile` from `@prisma/client` as follows:
-
-```ts
-import { User as UserModel, Post as PostModel, Prisma, Profile } from '@prisma/client'
-```
-
-#### 2.2 Testing out your new endpoint
-
-Restart your application server and test out your new endpoint.
-
-##### `POST`
-
-- `/user/:id/profile`: Create a new profile based on the user id
-  - Body:
-    - `bio: String` : The bio of the user
-
-
-<details><summary>Expand to view more sample Prisma Client queries on <code>Profile</code></summary>
-
-Here are some more sample Prisma Client queries on the new <code>Profile</code> model:
-
-##### Create a new profile for an existing user
+#### Create a new profile for an existing user
 
 ```ts
 const profile = await prisma.profile.create({
   data: {
-    bio: 'Hello World',
+    bio: "Hello World",
     user: {
-      connect: { email: 'alice@prisma.io' },
+      connect: { email: "alice@prisma.io" },
     },
   },
-})
+});
 ```
 
-##### Create a new user with a new profile
+#### Create a new user with a new profile
 
 ```ts
 const user = await prisma.user.create({
   data: {
-    email: 'john@prisma.io',
-    name: 'John',
+    email: "john@prisma.io",
+    name: "John",
     profile: {
       create: {
-        bio: 'Hello World',
+        bio: "Hello World",
       },
     },
   },
-})
+});
 ```
 
-##### Update the profile of an existing user
+#### Update the profile of an existing user
 
 ```ts
 const userWithUpdatedProfile = await prisma.user.update({
-  where: { email: 'alice@prisma.io' },
+  where: { email: "alice@prisma.io" },
   data: {
     profile: {
       update: {
-        bio: 'Hello Friends',
+        bio: "Hello Friends",
       },
     },
   },
-})
+});
 ```
 
-</details>
+
+### 3. Build new UI features in React
+
+Once you have added a new endpoint to the API (e.g. `/api/profile` with `/POST`, `/PUT` and `GET` operations), you can start building a new UI component in React. It could e.g. be called `profile.tsx` and would be located in the `pages` directory.
+
+In the application code, you can access the new endpoint via `fetch` operations and populate the UI with the data you receive from the API calls.
+
 
 ## Switch to another database (e.g. PostgreSQL, MySQL, SQL Server, MongoDB)
 
