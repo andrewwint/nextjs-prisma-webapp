@@ -46,7 +46,6 @@ npx prisma migrate dev --name init
 
 When `npx prisma migrate dev` is executed against a newly created database, seeding is also triggered. The seed file in [`prisma/seed.ts`](./prisma/seed.ts) will be executed and your database will be populated with the sample data.
 
-
 ### 3. Start the app
 
 ```
@@ -80,6 +79,44 @@ The app is now running, navigate to [`http://localhost:3000/`](http://localhost:
 ![](https://imgur.com/zS1B11O.png)
 
 </details>
+
+### 4. Build the Docker image:
+
+```
+docker build -t your-image-name .
+```
+
+Replace `your-image-name` with the name you want to give to your Docker image.
+
+This will build the Docker image for the Next.js app.
+
+### 5. Running the Docker container
+
+To run the Docker container for the Next.js app, follow these steps:
+
+- Start the Docker container:
+
+```
+ docker run -p 3000:3000 your-image-name
+```
+
+Replace `your-image-name` with the name of your Docker image.
+
+Open your web browser and navigate to http://localhost:3000. You should see the app running.
+
+### 6. Stopping the Docker container
+
+To stop the Docker container for the Next.js app, use the following command:
+
+```
+docker stop <container-id>
+```
+
+Replace `<container-id>` with the ID of your Docker container. You can find the container ID by running the following command:
+
+```
+docker ps
+```
 
 ## Using the REST API
 
@@ -137,8 +174,8 @@ model Post {
 }
 
 model User {
-  id      Int      @default(autoincrement()) @id 
-  name    String? 
+  id      Int      @default(autoincrement()) @id
+  name    String?
   email   String   @unique
   posts   Post[]
 + profile Profile?
@@ -206,17 +243,15 @@ const userWithUpdatedProfile = await prisma.user.update({
 });
 ```
 
-
 ### 3. Build new UI features in React
 
 Once you have added a new endpoint to the API (e.g. `/api/profile` with `/POST`, `/PUT` and `GET` operations), you can start building a new UI component in React. It could e.g. be called `profile.tsx` and would be located in the `pages` directory.
 
 In the application code, you can access the new endpoint via `fetch` operations and populate the UI with the data you receive from the API calls.
 
-
 ## Switch to another database (e.g. PostgreSQL, MySQL, SQL Server, MongoDB)
 
-If you want to try this example with another database than SQLite, you can adjust the the database connection in [`prisma/schema.prisma`](./prisma/schema.prisma) by reconfiguring the `datasource` block. 
+If you want to try this example with another database than SQLite, you can adjust the the database connection in [`prisma/schema.prisma`](./prisma/schema.prisma) by reconfiguring the `datasource` block.
 
 Learn more about the different connection configurations in the [docs](https://www.prisma.io/docs/reference/database-reference/connection-urls).
 
